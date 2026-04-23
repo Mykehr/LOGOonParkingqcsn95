@@ -24,14 +24,35 @@
             </a-assets>
 
                 <a-entity
-                    look-at="[gps-camera]"
-                    animation-mixer="loop: repeat"
-                    gltf-model="#animated-asset"
-                    scale="0.44243928534905635 0.44243928534905635 0.44243928534905635"
+                  look-at="[gps-camera]"
+                  animation-mixer="loop: repeat"
+                  gltf-model="#animated-asset"
+                  scale-to-width="width: 3"
                     gps-entity-place="latitude: 34.506689; longitude: 135.625063;"
                 ></a-entity>
 
             <a-camera gps-camera rotation-reader></a-camera>
         </a-scene>
+        <script>
+          AFRAME.registerComponent('scale-to-width', {
+            schema: { width: { type: 'number', default: 3 } },
+
+            init: function () {
+              this.el.addEventListener('model-loaded', () => {
+                const obj = this.el.getObject3D('mesh');
+                if (!obj) return;
+
+                const box = new THREE.Box3().setFromObject(obj);
+                const size = new THREE.Vector3();
+                box.getSize(size);
+
+                if (size.x <= 0) return;
+
+                const factor = this.data.width / size.x;
+                this.el.object3D.scale.set(factor, factor, factor);
+              });
+            }
+          });
+          </script>
     </body>
 </html>
